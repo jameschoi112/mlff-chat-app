@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Send, Bot, User, CheckCircle, AlertCircle, Clock, CreditCard, Car, MapPin, FileText, Phone } from 'lucide-react';
 
 const ChatApp = () => {
@@ -11,7 +11,7 @@ const ChatApp = () => {
   const messagesEndRef = useRef(null);
 
   // 시나리오별 더미 대화
-  const scenarios = {
+  const scenarios = useMemo(() => ({
     1: {
       title: "비회원 FAQ",
       icon: FileText,
@@ -175,7 +175,7 @@ const ChatApp = () => {
         }
       ]
     }
-  };
+  }), []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -185,20 +185,7 @@ const ChatApp = () => {
     scrollToBottom();
   }, [messages]);
 
-  useEffect(() => {
-    // 시나리오 변경 시 초기화
-    setMessages([]);
-    setCurrentStep(0);
-    setSatisfactionStatus({});
-    setIsTyping(false);
-
-    // 새 시나리오의 첫 메시지 표시
-    setTimeout(() => {
-      addBotMessage(scenarios[activeScenario].responses[0]);
-    }, 500);
-  }, [activeScenario]);
-
-  const addBotMessage = (response) => {
+  const addBotMessage = useCallback((response) => {
     setIsTyping(true);
     const typingTime = response.type === 'loading' ? 2000 : 1500;
 
@@ -231,7 +218,20 @@ const ChatApp = () => {
         }
       }
     }, typingTime);
-  };
+  }, [activeScenario, scenarios]);
+
+  useEffect(() => {
+    // 시나리오 변경 시 초기화
+    setMessages([]);
+    setCurrentStep(0);
+    setSatisfactionStatus({});
+    setIsTyping(false);
+
+    // 새 시나리오의 첫 메시지 표시
+    setTimeout(() => {
+      addBotMessage(scenarios[activeScenario].responses[0]);
+    }, 500);
+  }, [activeScenario, addBotMessage, scenarios]);
 
   const handleSend = () => {
     if (inputValue.trim() === '') return;
