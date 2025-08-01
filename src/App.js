@@ -10,84 +10,84 @@ const ChatApp = () => {
   const [satisfactionStatus, setSatisfactionStatus] = useState({});
   const messagesEndRef = useRef(null);
 
-  // 시나리오별 더미 대화
+  // Dummy conversations for each scenario
   const scenarios = useMemo(() => ({
     1: {
-      title: "비회원 FAQ",
+      title: "Non-member FAQ",
       icon: FileText,
       responses: [
         {
-          text: "안녕하세요! 말레이시아 MLFF 통행료 서비스입니다. 문의 해결을 위해 회원 로그인을 하시겠어요?",
-          options: ["로그인", "비회원으로 계속"],
+          text: "Hello! This is the Malaysian MLFF toll service. Would you like to log in to resolve your inquiry?",
+          options: ["Login", "Continue as a guest"],
           type: 'welcome'
         },
         {
-          text: "네, 비회원으로 상담을 진행합니다. 무엇을 도와드릴까요?",
+          text: "Yes, we will proceed with the consultation as a non-member. How can I help you?",
           type: 'text'
         },
         {
-          text: "MLFF 시스템에서는 RFID 태그가 없는 차량의 경우, 차량 번호판을 자동으로 인식하여 통행료가 후불로 부과됩니다.",
+          text: "In the MLFF system, for vehicles without an RFID tag, the toll is charged postpaid by automatically recognizing the license plate.",
           additionalInfo: {
-            title: "RFID 미등록 차량 통행 안내",
+            title: "Information for vehicles without RFID",
             details: [
-              { icon: Car, text: "차량 번호판 자동 인식" },
-              { icon: Clock, text: "통행 후 7일 이내 납부" },
-              { icon: CreditCard, text: "온라인/오프라인 결제 가능" }
+              { icon: Car, text: "Automatic license plate recognition" },
+              { icon: Clock, text: "Payment within 7 days of passage" },
+              { icon: CreditCard, text: "Online/offline payment available" }
             ],
-            link: { text: "결제 안내 페이지 바로가기", url: "#" }
+            link: { text: "Go to payment guide page", url: "#" }
           },
           type: 'detailed'
         },
         {
-          text: "도움이 되셨다니 다행입니다! 다른 질문이 없으시면 상담을 종료하겠습니다.",
+          text: "I'm glad I could help! If you have no other questions, I will end the consultation.",
           satisfaction: true,
           type: 'closing'
         }
       ]
     },
     2: {
-      title: "회원 조회",
+      title: "Member Inquiry",
       icon: CreditCard,
       responses: [
         {
-          text: "안녕하세요! 말레이시아 MLFF 통행료 서비스입니다. 문의 해결을 위해 회원 로그인을 하시겠어요?",
-          options: ["로그인", "비회원으로 계속"],
+          text: "Hello! This is the Malaysian MLFF toll service. Would you like to log in to resolve your inquiry?",
+          options: ["Login", "Continue as a guest"],
           type: 'welcome'
         },
         {
-          text: "회원 인증이 완료되었습니다. 안녕하세요, 김민수님! 무엇을 도와드릴까요?",
-          options: ["미납 내역 확인", "사용 내역 조회", "RFID 등록 상태"],
+          text: "Member authentication is complete. Hello, Minsu Kim! How can I help you?",
+          options: ["Check unpaid balance", "View usage history", "RFID registration status"],
           type: 'authenticated'
         },
-        // --- 미납 내역 시나리오 ---
+        // --- Unpaid balance scenario ---
         {
-          text: "미납 내역을 확인하고 있습니다...",
+          text: "Checking unpaid balance...",
           type: 'loading',
-          trigger: "미납 내역 확인"
+          trigger: "Check unpaid balance"
         },
         {
-          text: "김민수님, 현재 미납 내역은 총 2건, RM 12.50 입니다.",
+          text: "Minsu Kim, you have a total of 2 unpaid items, amounting to RM 12.50.",
           additionalInfo: {
-            title: "미납 통행료 상세 내역",
+            title: "Details of unpaid tolls",
             details: [
               { icon: MapPin, text: "7/15 - Duke Highway (RM 5.50)" },
               { icon: MapPin, text: "7/20 - SMART Tunnel (RM 7.00)" },
-              { icon: Clock, text: "납부 기한: 7/27까지" }
+              { icon: Clock, text: "Payment due: by 7/27" }
             ],
-            link: { text: "지금 결제하기", url: "#" }
+            link: { text: "Pay now", url: "#" }
           },
           type: 'detailed'
         },
-        // --- 사용 내역 시나리오 ---
+        // --- Usage history scenario ---
         {
-          text: "사용 내역을 조회하고 있습니다...",
+          text: "Retrieving usage history...",
           type: 'loading',
-          trigger: "사용 내역 조회"
+          trigger: "View usage history"
         },
         {
-          text: "김민수님, 최근 1개월 사용 내역은 총 5건, RM 25.00 입니다.",
+          text: "Minsu Kim, your usage history for the last month is 5 transactions, totaling RM 25.00.",
           additionalInfo: {
-            title: "최근 통행료 사용 내역",
+            title: "Recent toll usage history",
             details: [
               { icon: MapPin, text: "7/22 - KESAS Highway (RM 2.00)" },
               { icon: MapPin, text: "7/18 - LDP Highway (RM 3.00)" },
@@ -95,80 +95,85 @@ const ChatApp = () => {
               { icon: MapPin, text: "7/10 - SMART Tunnel (RM 7.00)" },
               { icon: MapPin, text: "7/02 - NPE Highway (RM 7.50)" },
             ],
-            link: { text: "전체 내역 다운로드", url: "#" }
+            link: { text: "Download full history", url: "#" }
           },
           type: 'detailed'
         },
-        // --- RFID 상태 시나리오 ---
+        // --- RFID status scenario ---
         {
-          text: "RFID 등록 상태를 조회하고 있습니다...",
+          text: "Checking RFID registration status...",
           type: 'loading',
-          trigger: "RFID 등록 상태"
+          trigger: "RFID registration status"
         },
         {
-          text: "김민수님의 차량(ABC 1234)은 RFID 태그가 정상적으로 등록 및 활성화되어 있습니다.",
+          text: "Minsu Kim's vehicle (ABC 1234) has its RFID tag normally registered and activated.",
           additionalInfo: {
-            title: "RFID 태그 정보",
+            title: "RFID Tag Information",
             details: [
-              { icon: Car, text: "차량번호: ABC 1234" },
-              { icon: CheckCircle, text: "상태: 활성화 (Active)" },
-              { icon: CreditCard, text: "연결된 카드: ****-****-****-5678" }
+              { icon: Car, text: "Vehicle number: ABC 1234" },
+              { icon: CheckCircle, text: "Status: Active" },
+              { icon: CreditCard, text: "Linked card: ****-****-****-5678" }
             ],
-            link: { text: "태그 정보 수정하기", url: "#" }
+            link: { text: "Edit tag information", url: "#" }
           },
           type: 'detailed'
         },
-        // --- 공통 마무리 ---
+        // --- Common closing ---
         {
-          text: "확인하셨습니까? 다른 문의사항이 있으신가요?",
+          text: "Have you confirmed? Do you have any other questions?",
           satisfaction: true,
           type: 'closing'
         }
       ]
     },
     3: {
-      title: "상담사 전환",
+      title: "Agent Transfer",
       icon: Phone,
       responses: [
         {
-          text: "안녕하세요! 말레이시아 MLFF 통행료 서비스입니다. 어떤 도움이 필요하신가요?",
+          text: "Hello! This is the Malaysian MLFF toll service. How can I help you?",
           type: 'welcome'
         },
         {
-          text: "번호판 오인식 문제로 확인해보겠습니다. 잠시만 기다려주세요...",
+          text: "I will check on the license plate misidentification issue. Please wait a moment...",
           type: 'loading'
         },
         {
-          text: "고객님, 해당 문제는 전문 상담사의 확인이 필요합니다. 상담사를 연결해 드릴까요?",
-          options: ["네, 연결해주세요", "나중에 할게요"],
+          text: "Sir, this issue requires confirmation from a professional agent. Shall I connect you to an agent?",
+          options: ["Yes, please connect", "I'll do it later"],
           type: 'escalation'
         },
         {
-          text: "상담사를 연결중입니다. 잠시만 기다려주세요...",
+          text: "Connecting to an agent. Please wait a moment...",
           additionalInfo: {
-            title: "상담사 연결 안내",
+            title: "Agent Connection Guide",
             details: [
-              { icon: Clock, text: "예상 대기시간: 2-3분" },
-              { icon: User, text: "현재 대기 인원: 3명" },
-              { icon: Phone, text: "운영 시간: 09:00 - 18:00" }
+              { icon: Clock, text: "Estimated waiting time: 2-3 minutes" },
+              { icon: User, text: "People currently waiting: 3" },
+              { icon: Phone, text: "Operating hours: 09:00 - 18:00" }
             ]
           },
           type: 'connecting'
         },
         {
-          text: "안녕하세요, 상담사 이지현입니다. AI와 나누신 대화 내용은 모두 확인했습니다. 번호판 오인식 문제로 문의주셨군요. 7월 5일자 통행 기록을 확인해보겠습니다.",
+          text: "Agent connected.",
+          type: 'agentConnected'
+        },
+        {
+          text: "Hello, this is agent Jihyun Lee. I have reviewed your conversation with the AI. You inquired about a license plate misidentification issue. I will check the toll record for July 5th.",
           agent: true,
           type: 'agent'
         },
         {
-          text: "고객님, 7월 5일 14:30에 Duke 하이웨이를 통과한 기록이 확인됩니다. 해당 차량 이미지를 확인해보니 번호판이 일부 가려져 있어 오인식된 것으로 보입니다. 즉시 수정 처리해드리겠습니다.",
+          text: "Sir, a record of passing through Duke Highway at 14:30 on July 5th has been confirmed. After checking the vehicle image, it seems that the license plate was partially obscured, leading to a misidentification. I will correct it immediately.",
           agent: true,
           additionalInfo: {
-            title: "처리 결과",
+            title: "Resolution Result",
+            image: "/images/license-plate.png",
             details: [
-              { icon: CheckCircle, text: "잘못 부과된 요금 취소 완료" },
-              { icon: CreditCard, text: "환불 예정일: 영업일 3-5일" },
-              { icon: FileText, text: "처리번호: CS2024-0705-1234" }
+              { icon: CheckCircle, text: "Incorrectly charged fee canceled" },
+              { icon: CreditCard, text: "Refund scheduled in 3-5 business days" },
+              { icon: FileText, text: "Case number: CS2024-0705-1234" }
             ]
           },
           type: 'resolution'
@@ -201,19 +206,26 @@ const ChatApp = () => {
       }]);
       setIsTyping(false);
 
-      // loading 타입일 경우 자동으로 다음 메시지 진행
-      if (response.type === 'loading') {
+      // Automatically proceed to the next message for loading, connecting, agentConnected types
+      if (response.type === 'loading' || response.type === 'connecting' || response.type === 'agentConnected') {
         const currentResponses = scenarios[activeScenario].responses;
-        const currentIndex = currentResponses.indexOf(response);
-        
+        const currentIndex = currentResponses.findIndex(r => r.text === response.text && r.type === response.type);
+
         if (currentIndex !== -1) {
-          // loading 메시지 바로 다음의 응답을 찾는다.
           const nextStep = currentIndex + 1;
-          if (nextStep < currentResponses.length && !currentResponses[nextStep].trigger) {
+          if (nextStep < currentResponses.length) {
             setCurrentStep(nextStep);
+            
+            let delay = 500;
+            if (response.type === 'connecting') {
+              delay = 3000;
+            } else if (response.type === 'agentConnected') {
+              delay = 1000; // Show agent message after 1 second
+            }
+
             setTimeout(() => {
               addBotMessage(currentResponses[nextStep]);
-            }, 500);
+            }, delay);
           }
         }
       }
@@ -221,13 +233,13 @@ const ChatApp = () => {
   }, [activeScenario, scenarios]);
 
   useEffect(() => {
-    // 시나리오 변경 시 초기화
+    // Initialize when scenario changes
     setMessages([]);
     setCurrentStep(0);
     setSatisfactionStatus({});
     setIsTyping(false);
 
-    // 새 시나리오의 첫 메시지 표시
+    // Show the first message of the new scenario
     setTimeout(() => {
       addBotMessage(scenarios[activeScenario].responses[0]);
     }, 500);
@@ -236,7 +248,7 @@ const ChatApp = () => {
   const handleSend = () => {
     if (inputValue.trim() === '') return;
 
-    // 사용자 메시지 추가
+    // Add user message
     setMessages(prev => [...prev, {
       text: inputValue,
       sender: 'user',
@@ -245,7 +257,7 @@ const ChatApp = () => {
 
     setInputValue('');
 
-    // 다음 봇 응답
+    // Next bot response
     const nextStep = currentStep + 1;
     if (nextStep < scenarios[activeScenario].responses.length) {
       setCurrentStep(nextStep);
@@ -254,7 +266,7 @@ const ChatApp = () => {
   };
 
   const handleOptionClick = (option) => {
-    // 옵션 클릭을 사용자 메시지로 처리
+    // Treat option click as a user message
     setMessages(prev => [...prev, {
       text: option,
       sender: 'user',
@@ -262,18 +274,30 @@ const ChatApp = () => {
     }]);
 
     const currentResponses = scenarios[activeScenario].responses;
-    // 'trigger' 속성이 옵션 텍스트와 일치하는 응답을 찾는다.
+    // Find the response where the 'trigger' property matches the option text.
     const nextStepIndex = currentResponses.findIndex(r => r.trigger === option);
 
     if (nextStepIndex !== -1) {
       setCurrentStep(nextStepIndex);
       addBotMessage(currentResponses[nextStepIndex]);
     } else {
-      // 일치하는 trigger가 없는 경우 (예: 로그인, 비회원 계속 등) 기존 로직을 유지
-      const nextStep = currentStep + 1;
-      if (nextStep < currentResponses.length) {
-        setCurrentStep(nextStep);
-        addBotMessage(currentResponses[nextStep]);
+      // Special handling for "Yes, please connect" option
+      if (option === "Yes, please connect") {
+        const escalationResponse = currentResponses.find(r => r.type === 'escalation');
+        const escalationIndex = currentResponses.indexOf(escalationResponse);
+        const connectingStep = escalationIndex + 1;
+        
+        if (connectingStep < currentResponses.length) {
+          setCurrentStep(connectingStep);
+          addBotMessage(currentResponses[connectingStep]);
+        }
+      } else {
+        // Maintain existing logic if no matching trigger is found (e.g., Login, Continue as guest)
+        const nextStep = currentStep + 1;
+        if (nextStep < currentResponses.length) {
+          setCurrentStep(nextStep);
+          addBotMessage(currentResponses[nextStep]);
+        }
       }
     }
   };
@@ -286,7 +310,7 @@ const ChatApp = () => {
   };
 
   const formatTime = (date) => {
-    return date.toLocaleTimeString('ko-KR', {
+    return date.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit'
     });
@@ -297,6 +321,14 @@ const ChatApp = () => {
     const isAgent = message.sender === 'agent';
     const isUser = message.sender === 'user';
     const selectedSatisfaction = satisfactionStatus[index];
+    const [animate, setAnimate] = useState(true);
+
+    useEffect(() => {
+      if (message.type === 'agentConnected') {
+        const timer = setTimeout(() => setAnimate(false), 1000); // Change state after animation duration
+        return () => clearTimeout(timer);
+      }
+    }, [message.type]);
 
     return (
       <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
@@ -309,7 +341,7 @@ const ChatApp = () => {
 
           <div>
             {isAgent && (
-              <p className="text-xs text-purple-600 font-medium mb-1">상담사 이지현</p>
+              <p className="text-xs text-purple-600 font-medium mb-1">Agent Jihyun Lee</p>
             )}
             <div className={`rounded-2xl px-4 py-3 ${
               isUser
@@ -318,12 +350,22 @@ const ChatApp = () => {
                 ? 'bg-purple-100 text-gray-800 rounded-tl-none'
                 : 'bg-gray-100 text-gray-800 rounded-tl-none'
             }`}>
-              <p className="text-sm leading-relaxed">{message.text}</p>
+              {message.type === 'agentConnected' ? (
+                <div className={`flex items-center justify-center p-2 bg-white rounded-lg shadow-sm border border-gray-200 ${animate ? 'animate-agent-connected' : ''}`}>
+                  <CheckCircle className={`w-5 h-5 text-purple-500 mr-2 ${animate ? 'animate-scale-in-fast' : ''}`} />
+                  <p className="text-sm font-medium text-purple-600">{message.text}</p>
+                </div>
+              ) : (
+                <p className="text-sm leading-relaxed">{message.text}</p>
+              )}
 
-              {/* 상세 정보 카드 */}
+              {/* Detailed Info Card */}
               {message.additionalInfo && (
                 <div className="mt-3 bg-white rounded-xl p-4 shadow-sm border border-gray-200">
                   <h4 className="font-semibold text-gray-900 mb-3">{message.additionalInfo.title}</h4>
+                  {message.additionalInfo.image && (
+                    <img src={process.env.PUBLIC_URL + message.additionalInfo.image} alt="License plate" className="w-full rounded-lg mt-2 mb-3 border" />
+                  )}
                   <div className="space-y-2">
                     {message.additionalInfo.details.map((detail, idx) => (
                       <div key={idx} className="flex items-center text-gray-700">
@@ -343,7 +385,7 @@ const ChatApp = () => {
                 </div>
               )}
 
-              {/* 만족도 조사 */}
+              {/* Satisfaction Survey */}
               {message.satisfaction && (
                 <div className="mt-3">
                   {!selectedSatisfaction ? (
@@ -353,14 +395,14 @@ const ChatApp = () => {
                         className="flex items-center px-3 py-2 bg-green-100 text-green-700 rounded-lg text-sm hover:bg-green-200 transition-colors"
                       >
                         <CheckCircle className="w-4 h-4 mr-1" />
-                        만족
+                        Satisfied
                       </button>
                       <button
                         onClick={() => handleSatisfaction(index, 'unsatisfied')}
                         className="flex items-center px-3 py-2 bg-red-100 text-red-700 rounded-lg text-sm hover:bg-red-200 transition-colors"
                       >
                         <AlertCircle className="w-4 h-4 mr-1" />
-                        불만족
+                        Unsatisfied
                       </button>
                     </div>
                   ) : (
@@ -372,12 +414,12 @@ const ChatApp = () => {
                       {selectedSatisfaction === 'satisfied' ? (
                         <>
                           <CheckCircle className="w-5 h-5 text-green-600 mr-2 animate-scale-in" />
-                          <span className="text-green-700 font-medium">감사합니다! 😊</span>
+                          <span className="text-green-700 font-medium">Thank you! 😊</span>
                         </>
                       ) : (
                         <>
                           <AlertCircle className="w-5 h-5 text-red-600 mr-2 animate-scale-in" />
-                          <span className="text-red-700 font-medium">개선하겠습니다 🙏</span>
+                          <span className="text-red-700 font-medium">We will improve 🙏</span>
                         </>
                       )}
                     </div>
@@ -386,7 +428,7 @@ const ChatApp = () => {
               )}
             </div>
 
-            {/* 옵션 버튼들 */}
+            {/* Option Buttons */}
             {message.options && (
               <div className="mt-2 flex flex-wrap gap-2">
                 {message.options.map((option, idx) => (
@@ -419,13 +461,13 @@ const ChatApp = () => {
                 <Bot className="w-6 h-6" />
               </div>
               <div>
-                <h1 className="text-lg font-semibold">MLFF 고객 지원</h1>
-                <p className="text-xs text-blue-100">AI 상담사가 도와드립니다</p>
+                <h1 className="text-lg font-semibold">MLFF Customer Support</h1>
+                <p className="text-xs text-blue-100">AI assistant is here to help</p>
               </div>
             </div>
             <div className="flex items-center space-x-1">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              <span className="text-xs">온라인</span>
+              <span className="text-xs">Online</span>
             </div>
           </div>
 
@@ -490,6 +532,25 @@ const ChatApp = () => {
           .animate-scale-in {
             animation: scale-in 0.3s ease-out;
           }
+          
+          @keyframes agent-connected-animation {
+            0% { transform: translateY(20px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+          }
+
+          .animate-agent-connected {
+            animation: agent-connected-animation 0.5s ease-out forwards;
+          }
+
+          @keyframes scale-in-fast {
+           0% { transform: scale(0); }
+           50% { transform: scale(1.3); }
+           100% { transform: scale(1); }
+          }
+
+          .animate-scale-in-fast {
+           animation: scale-in-fast 0.4s 0.2s ease-out backwards;
+          }
         `}</style>
 
         {messages.map((message, index) => (
@@ -523,7 +584,7 @@ const ChatApp = () => {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-            placeholder="메시지를 입력하세요..."
+            placeholder="Enter a message..."
             className="flex-1 px-4 py-3 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
           />
           <button
@@ -538,15 +599,15 @@ const ChatApp = () => {
         <div className="mt-3 flex space-x-2 overflow-x-auto pb-1">
           <button className="flex items-center px-3 py-1.5 bg-gray-100 rounded-full text-xs text-gray-600 whitespace-nowrap hover:bg-gray-200 transition-colors">
             <MapPin className="w-3 h-3 mr-1" />
-            통행 내역
+            Toll History
           </button>
           <button className="flex items-center px-3 py-1.5 bg-gray-100 rounded-full text-xs text-gray-600 whitespace-nowrap hover:bg-gray-200 transition-colors">
             <CreditCard className="w-3 h-3 mr-1" />
-            미납 요금
+            Unpaid Tolls
           </button>
           <button className="flex items-center px-3 py-1.5 bg-gray-100 rounded-full text-xs text-gray-600 whitespace-nowrap hover:bg-gray-200 transition-colors">
             <Car className="w-3 h-3 mr-1" />
-            RFID 등록
+            RFID Registration
           </button>
         </div>
       </div>
